@@ -22,9 +22,14 @@
 
 /* _____________ Your Code Here _____________ */
 
-type MyAwaited<T> = any
-
-/* _____________ Test Cases _____________ */
+type MyAwaited<T extends PromiseLike<any | PromiseLike<any>>> =
+  T extends PromiseLike<infer V>
+    ? V extends PromiseLike<any>
+      ? MyAwaited<V>
+      : V
+    : never;
+  
+  /* _____________ Test Cases _____________ */
 import type { Equal, Expect } from '@type-challenges/utils'
 
 type X = Promise<string>
@@ -32,6 +37,8 @@ type Y = Promise<{ field: number }>
 type Z = Promise<Promise<string | number>>
 type Z1 = Promise<Promise<Promise<string | boolean>>>
 type T = { then: (onfulfilled: (arg: number) => any) => any }
+
+var randstring:MyAwaited<X> = "abc"
 
 type cases = [
   Expect<Equal<MyAwaited<X>, string>>,
